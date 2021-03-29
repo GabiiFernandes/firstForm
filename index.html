@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário</title>
+</head>
+<style>
+    .container {
+        width: 50%;
+    }
+    .footer {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+</style>
+<body>
+    <div class="container">
+        <form action="#" id="cadastroPessoa">
+            <div class="form-group">
+                <label>Nome</label><br>
+                <input type="text" class="form-control" name="nome" placeholder="Nome Completo" required>
+            </div>
+            <div class="form-group">
+                <label>CPF</label><br>
+                <input type="text" class="form-control cpf" name="cpf"  placeholder="123.456.789-00" required>
+            </div>
+            <div class="form-group">
+                <label>Nascimento</label><br>
+                <input type="date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Telefone</label><br>
+                <input type="text" class="form-control tel" name="telefone" placeholder="(00) 00000-0000" required>
+            </div>
+            <div class="form-group">
+                <label>E-mail</label><br>
+                <input type="text" class="form-control" name="e-mail" nameplaceholder>
+            </div>
+            <div class="form-group">
+                <label>País</label><br>
+                <select class="form-control" name="pais" required>
+                    <option value="BR">Brasil</option>
+                    <option value="USA">Estados Unidos</option>
+                    <option value="CA">Canadá</option>
+                    <option value="ME">México</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>CEP</label><br>
+                <input type="text" class="form-control cep" id="cep" name="cep" onchange="searchCEP();" maxlength="8" minlength="8" required>
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <input type="text" class="form-control" id="state" name="estado" maxlength="2" minlength="2" >
+            </div>
+            <div class="form-group">
+                <label>Cidade</label>
+                <input type="text" class="form-control" id="city" name="cidade" maxlength="50" >
+            </div>
+            <div class="form-group">
+                <label>Bairro</label>
+                <input type="text" class="form-control" id="district" name="bairro" maxlength="50" >
+            </div>
+            <div class="form-group">
+                <label>Rua</label>
+                <input type="text" class="form-control" id="street" name="rua" maxlength="50">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</body>
+<footer>
+    <div class="footer">
+        <p>Author: Gabriele de Lima Fernandes<br>
+            <a href="https://www.linkedin.com/in/gabriele-de-lima-fernandes-089a081b4/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+        </p>
+    </div>
+
+</footer>
+</html>
+
+<script>
+    $(document).ready(function() {
+        $('.cpf').mask('000.000.000-00')
+        $('.tel').mask('(00) 00000-0000')
+        $('.cep').mask('00000-000')
+    });
+    
+    $('#teste').click(function(){
+        saveTxt();
+    });
+
+    $('#cadastroPessoa').submit(function(){
+        saveTxt();
+        alert('Pessoa cadastrada com sucesso!');
+        $('#cadastroPessoa')[0].reset();
+    });
+
+    function searchCEP() {
+        let cep = String($('#cep').val());
+        $.get("https://brasilapi.com.br/api/cep/v1/" + cep, function( data ) {
+            $('#country').val('BR');
+            $('#city').val(data.city);
+            $('#state').val(data.state);
+            if(data.neighborhood !== undefined){
+                $('#district').val(data.neighborhood);
+            }
+            if(data.street !== undefined){
+                $('#street').val(data.street);
+            }
+        });
+    }
+
+    function saveTxt() {
+        let form =  $("#cadastroPessoa").serializeArray();
+        let texto = '';
+
+        for(let i = 0; i < form.length; i++) {
+            texto += form[i].name + ': ' + form[i].value + '\n'
+        }
+        let blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, "Formulario.txt");
+   }
+</script>
